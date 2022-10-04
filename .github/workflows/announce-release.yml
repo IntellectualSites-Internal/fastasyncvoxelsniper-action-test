@@ -15,4 +15,4 @@ jobs:
         args: |
           "<@254790994594234370>"
           "<:favs:673138127434416139> **FastAsyncVoxelSniper ${{ github.event.release.tag_name }}**"
-          "Click here for the changelog: https://github.com/IntellectualSites/fastasyncvoxelsniper/releases/tag/${{ github.event.release.tag_name }"
+          "Click here for the changelog: https://github.com/IntellectualSites/fastasyncvoxelsniper/releases/tag/${{ github.event.release.tag_name }}"

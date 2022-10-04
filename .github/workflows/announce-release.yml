@@ -15,7 +15,7 @@ jobs:
       uses: Ilshidur/action-discord@0.3.2
       with:
         args: |
-          "<@254790994594234370>"
+          "<@&673137848211472384>"
           ""
           "<:favs:673138127434416139> **FastAsyncVoxelSniper ${{ github.event.release.tag_name }} has been released!**"
           ""

@@ -30,17 +30,52 @@ jobs:
             echo "STATUS=snapshot" >> $GITHUB_ENV
           else
             echo "STATUS=release" >> $GITHUB_ENV
-          fi    
+          fi
+      - name: Publish Release
+        if: ${{ runner.os == 'Linux' && env.STATUS == 'release' && github.event_name == 'push' && github.ref == 'refs/heads/main'}}
+        run: ./gradlew publishToSonatype closeSonatypeStagingRepository --info
+        env :
+          ORG_GRADLE_PROJECT_sonatypeUsername : ${{ secrets.SONATYPE_USERNAME }}
+          ORG_GRADLE_PROJECT_sonatypePassword : ${{ secrets.SONATYPE_PASSWORD }}
+          ORG_GRADLE_PROJECT_signingKey : ${{ secrets.SIGNING_KEY }}
+          ORG_GRADLE_PROJECT_signingPassword : ${{ secrets.SIGNING_PASSWORD }}
+      - name : Publish Snapshot
+        if : ${{ runner.os == 'Linux' && env.STATUS != 'release' && github.event_name == 'push' && github.ref == 'refs/heads/main' }}
+        run : ./gradlew publishToSonatype
+        env :
+          ORG_GRADLE_PROJECT_sonatypeUsername : ${{ secrets.SONATYPE_USERNAME }}
+          ORG_GRADLE_PROJECT_sonatypePassword : ${{ secrets.SONATYPE_PASSWORD }}
+      - name: Publish javadocs
+        if: ${{ runner.os == 'Linux' && env.STATUS == 'release' && github.event_name == 'push' && github.ref == 'refs/heads/main'}}
+        uses: cpina/github-action-push-to-another-repository@main
+        env:
+          SSH_DEPLOY_KEY: ${{ secrets.SSH_DEPLOY_KEY }}
+        with:
+          source-directory: 'build/docs/javadoc'
+          destination-github-username: 'IntellectualSites'
+          destination-repository-name: 'fastasyncvoxelsniper-javadocs'
+          user-email: ${{ secrets.USER_EMAIL }}
+          target-branch: main
+      - name: Publish to Modrinth
+        if: ${{ runner.os == 'Linux' && env.STATUS == 'release' && github.event_name == 'push' && github.ref == 'refs/heads/main'}}
+        run: ./gradlew modrinth
+        env:
+          MODRINTH_TOKEN : ${{ secrets.MODRINTH_TOKEN }}
+      - name: Publish to GitHub actions
+        if: ${{ runner.os == 'Linux' && env.STATUS == 'release' && github.event_name == 'push' && github.ref == 'refs/heads/main'}}
+        uses: AButler/upload-release-assets@v2.0
+        with:
+          files: build/libs/fastasyncvoxelsniper-${{ github.event.release.tag_name }}.jar
+          repo-token: ${{ secrets.GITHUB_TOKEN }}
+          release-tag: ${{ github.event.release.tag_name }}
       - name : Publish to CurseForge
         if : ${{ runner.os == 'Linux' && env.STATUS == 'release' && github.event_name == 'push' && github.ref == 'refs/heads/main'}}
         uses: itsmeow/curseforge-upload@v3
         with:
-          file_path: build/libs/fastasyncvoxelsniper-${{ github.event.release.tag_name }}.jar
-          game_versions: "Minecraft 1.19.1:1.19:1.18.2:1.18.1:1.18:1.17:1.16,Java 17"
-          project_id: "454430"
+          file_path: build/libs/fastasyncvoxelsniper-${{ env.GITHUB_ENV }}.jar
+          game_versions: "Minecraft 1.19:1.19.1,Java 17"
+          project_id: 454430
           token: ${{ secrets.CURSEFORGE_TOKEN }}
           display_name: FastAsyncVoxelSniper ${{ github.event.release.tag_name }}
           release_type: release
-          game_endpoint: minecraft
-          relations: "fawe:requiredDependency"
           changelog: "Click here to view changelog: https://github.com/IntellectualSites/fastasyncvoxelsniper/releases/tag/${{ github.event.release.tag_name }}"

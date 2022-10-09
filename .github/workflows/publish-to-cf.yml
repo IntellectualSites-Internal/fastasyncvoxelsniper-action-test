@@ -40,6 +40,7 @@ jobs:
           project_id: 454430
           game_endpoint: minecraft
           token: ${{ secrets.CURSEFORGE_TOKEN }}
-          display_name: FastAsyncVoxelSniper ${{ github.event.release.tag_name }}
+          display_name: FastAsyncVoxelSniper ${{ env.GITHUB_ENV }}
           release_type: release
           changelog: "Click here to view changelog: https://github.com/IntellectualSites/fastasyncvoxelsniper/releases/tag/${{ github.event.release.tag_name }}"
+          changelog_type: markdown

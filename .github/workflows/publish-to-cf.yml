@@ -37,7 +37,8 @@ jobs:
         uses: itsmeow/curseforge-upload@v3
         with:
           file_path: build/libs/fastasyncvoxelsniper-${{ env.VERSION }}.jar
-          game_versions: "Minecraft 1.19:1.19.1,Minecraft 1.19:1.19,Minecraft 1.18:1.18.1,Minecraft 1.18:1.18.2"
+          #          1.18.1, 1.18.2, 1.19, 1.19.1
+          game_versions: "8897,9016,9190,9261"
           project_id: 454430
           game_endpoint: minecraft
           token: ${{ secrets.CURSEFORGE_TOKEN }}
